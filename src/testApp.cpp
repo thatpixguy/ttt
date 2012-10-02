@@ -39,6 +39,17 @@ void testApp::setup(){
 	for(int i=0;i<1000;i++) {
 	    pbLog[i]=0;
 	}
+
+	arduino.connect("/dev/ttyACM0",57600);
+
+	arduinoReady = false;
+	//ofAddListener(arduino.EInitialized, this, &testApp::setupArduino);
+}
+
+void testApp::setupArduino(){
+    arduinoReady = true;
+    arduino.sendDigitalPinMode(12,ARD_OUTPUT);
+    arduino.sendDigitalPinMode(13,ARD_OUTPUT);
 }
 
 //--------------------------------------------------------------
@@ -195,7 +206,16 @@ void testApp::update(){
 
 
 	}
-
+    if (arduinoReady) {
+        // just testing
+        arduino.sendDigital(13,pbConfidence>90);
+        arduino.sendDigital(12,pbConfidence<=90);
+    } else {
+        if (arduino.isArduinoReady()) {
+            arduinoReady = true;
+            setupArduino();
+        }
+    }
 }
 
 //--------------------------------------------------------------

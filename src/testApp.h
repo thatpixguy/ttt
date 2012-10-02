@@ -10,6 +10,8 @@
 class testApp : public ofBaseApp{
 
 	public:
+        void setupArduino();
+
 		void setup();
 		void update();
 		void draw();
@@ -56,6 +58,9 @@ class testApp : public ofBaseApp{
         int                 cursor_y;
 
         float           pbLog[1000];
+
+        ofArduino       arduino;
+        bool            arduinoReady;
 
 };
 
