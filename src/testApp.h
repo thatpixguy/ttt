@@ -56,6 +56,8 @@ class testApp : public ofBaseApp{
         float                 pbConfidence;
         float               pb1,pb2;
 
+        float               pb1_slow;
+        float               pb2_slow;
 
         int                 cursor_x;
         int                 cursor_y;

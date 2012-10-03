@@ -49,7 +49,7 @@ void testApp::setup(){
 void testApp::setupArduino(){
     arduinoReady = true;
     arduino.sendDigitalPinMode(12,ARD_OUTPUT);
-    arduino.sendDigitalPinMode(13,ARD_OUTPUT);
+    arduino.sendDigitalPinMode(11,ARD_OUTPUT);
 }
 
 
@@ -74,6 +74,7 @@ void testApp::update(){
 
     bool bNewFrame = false;
 
+
 	#ifdef _USE_LIVE_VIDEO
        vidGrabber.grabFrame();
 	   bNewFrame = vidGrabber.isFrameNew();
@@ -81,6 +82,11 @@ void testApp::update(){
         vidPlayer.idleMovie();
         bNewFrame = vidPlayer.isFrameNew();
 	#endif
+
+    int old_p1m1 = p1m1;
+    int old_p1m2 = p1m2;
+    int old_p2m1 = p2m1;
+    int old_p2m2 = p2m2;
 
 	if (bNewFrame){
 
@@ -138,6 +144,7 @@ void testApp::update(){
         if(pbConfidence>90) {
             //ofPixelsRef colorPixels = colorImg.getPixelsRef();
 
+
             pb1 = 100;
 
             //ofSetColor(ofColor::green);
@@ -161,6 +168,7 @@ void testApp::update(){
                 //ofLine(x+20,pb1Rect.y+pb1Rect.height+20,x+20,pb1Rect.y+pb1Rect.height+(avg)+20);
             }
 
+
             pb2 = 100;
             for(int i=0;i<pb2Rect.width;i++) {
                 int x = i+pb2Rect.x;
@@ -178,31 +186,35 @@ void testApp::update(){
                     drawBox(colorPixels,ofColor::green,x,pb2Rect.y-10,3,pb2Rect.height+20);
                     break;
                 }
-
             }
+
 
             //check match lights
             ofColor c;
 
             c = colorPixels.getColor(p2m1p.x,p2m1p.y);
+            old_p2m1 = p2m1;
             p2m1 = (c.r>mThreshold);
 
             drawNotchedBox(colorPixels,ofColor::red,ofColor::green,p2m1p.x-2,p2m1p.y,3,c.r,0,10);
 
 
             c = colorPixels.getColor(p2m2p.x,p2m2p.y);
+            old_p2m2 = p2m2;
             p2m2 = (c.r>mThreshold);
 
             drawNotchedBox(colorPixels,ofColor::red,ofColor::green,p2m2p.x-2,p2m2p.y,3,c.r,0,10);
 
 
             c = colorPixels.getColor(p1m1p.x,p1m1p.y);
+            old_p1m1 = p1m1;
             p1m1 = (c.r>mThreshold);
 
             drawNotchedBox(colorPixels,ofColor::red,ofColor::green,p1m1p.x-2,p1m1p.y,3,c.r,0,10);
 
 
             c = colorPixels.getColor(p1m2p.x,p1m2p.y);
+            old_p1m2 = p1m2;
             p1m2 = (c.r>mThreshold);
 
             drawNotchedBox(colorPixels,ofColor::red,ofColor::green,p1m2p.x-2,p1m2p.y,3,c.r,0,10);
@@ -210,20 +222,42 @@ void testApp::update(){
 
         }
 
+        // process data and generate zaps here
+        int rate = 100;
 
+        pb1_slow-=ofGetLastFrameTime()*rate;
+
+        if (pb1>pb1_slow) {
+            pb1_slow = pb1;
+        }
+
+        drawBox(colorPixels,ofColor::blue,pb1Rect.x+(((100-pb1_slow)/100.0)*pb1Rect.width)-3,pb1Rect.y,3,20);
+
+        pb2_slow-=ofGetLastFrameTime()*rate;
+
+        if (pb2>pb2_slow) {
+            pb2_slow = pb2;
+        }
+
+        drawBox(colorPixels,ofColor::blue,pb2Rect.x+(((pb2_slow)/100.0)*pb2Rect.width),pb2Rect.y,3,20);
 
 
 	}
+
+
     if (arduinoReady) {
         // just testing
-        arduino.sendDigital(13,pbConfidence>90);
-        arduino.sendDigital(12,pbConfidence<=90);
+        arduino.sendDigital(12,(pb1+1)<pb1_slow);
+        arduino.sendDigital(11,(pb2+1)<pb2_slow);
     } else {
         if (arduino.isArduinoReady()) {
             arduinoReady = true;
             setupArduino();
         }
     }
+
+    printf("frametime %f\n",ofGetLastFrameTime());
+
 }
 
 //--------------------------------------------------------------
@@ -263,6 +297,7 @@ void testApp::draw(){
 	sprintf(reportStr, "pbConfidence %f\npbThreshold: %d\nfps: %f\npb1: %f\npb2: %f\nm: %d %d %d %d\n", pbConfidence, pbThreshold, ofGetFrameRate(),pb1,pb2, p1m2, p1m1, p2m1, p2m2);
 	ofDrawBitmapString(reportStr, 20, 600);
 
+
 }
 
 //--------------------------------------------------------------
@@ -287,8 +322,14 @@ void testApp::keyPressed(int key){
         case 356:
             vidPlayer.setFrame(vidPlayer.getCurrentFrame()-30);
             break;
+        case 357:
+            vidPlayer.setFrame(vidPlayer.getCurrentFrame()+300);
+            break;
         case 358:
             vidPlayer.setFrame(vidPlayer.getCurrentFrame()+30);
+            break;
+        case 359:
+            vidPlayer.setFrame(vidPlayer.getCurrentFrame()-300);
             break;
         default:
             printf("unknown key [%d]\n",key);
