@@ -65,11 +65,7 @@ void testApp::drawNotchedBox(ofPixelsRef p, ofColor b, ofColor n, int x, int y, 
 }
 
 void testApp::drawBox(ofPixelsRef p, ofColor c, int x, int y, int w, int h) {
-    for (int hi=0;hi<h;++hi) {
-        for (int wi=0;wi<w;++wi) {
-            p.setColor(x+wi,y+hi,c);
-        }
-    }
+    drawNotchedBox(p,c,c,x,y,w,h,0,0);
 }
 
 //--------------------------------------------------------------
