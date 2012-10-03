@@ -26,6 +26,9 @@ class testApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
+        void drawBox(ofPixelsRef p, ofColor c, int x, int y, int w, int h);
+        void drawNotchedBox(ofPixelsRef p, ofColor c, ofColor n, int x, int y, int w, int h, int wn, int hn);
+
         #ifdef _USE_LIVE_VIDEO
 		  ofVideoGrabber 		vidGrabber;
 		#else

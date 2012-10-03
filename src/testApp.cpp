@@ -52,6 +52,26 @@ void testApp::setupArduino(){
     arduino.sendDigitalPinMode(13,ARD_OUTPUT);
 }
 
+
+void testApp::drawNotchedBox(ofPixelsRef p, ofColor b, ofColor n, int x, int y, int w, int h, int wn, int hn) {
+    for (int hi=0;hi<h;++hi) {
+        for (int wi=0;wi<w;++wi) {
+            ofColor c = b;
+            if(wn!=0 && !(wi%wn)) c = n;
+            if(hn!=0 && !(hi%hn)) c = n;
+            p.setColor(x+wi,y+hi,c);
+        }
+    }
+}
+
+void testApp::drawBox(ofPixelsRef p, ofColor c, int x, int y, int w, int h) {
+    for (int hi=0;hi<h;++hi) {
+        for (int wi=0;wi<w;++wi) {
+            p.setColor(x+wi,y+hi,c);
+        }
+    }
+}
+
 //--------------------------------------------------------------
 void testApp::update(){
 	ofBackground(100,100,100);
@@ -137,9 +157,9 @@ void testApp::update(){
                 int avg = sum/pb1Rect.height;
                 if(avg<pbThreshold) {
                     pb1 = 100-(i*100.0/pb1Rect.width);
-                    for(int y=pb1Rect.y-10;y<pb1Rect.y+pb1Rect.height+10;y++) {
-                        colorPixels.setColor(x,y,ofColor::green);
-                    }
+
+                    drawBox(colorPixels,ofColor::green,x-3,pb1Rect.y-10,3,pb1Rect.height+20);
+
                     break;
                 }
                 //ofLine(x+20,pb1Rect.y+pb1Rect.height+20,x+20,pb1Rect.y+pb1Rect.height+(avg)+20);
@@ -158,9 +178,8 @@ void testApp::update(){
                 int avg = sum/pb2Rect.height;
                 if(avg<pbThreshold) {
                     pb2 = (i*100.0/pb2Rect.width);
-                    for(int y=pb2Rect.y-10;y<pb2Rect.y+pb2Rect.height+10;y++) {
-                        colorPixels.setColor(x,y,ofColor::green);
-                    }
+
+                    drawBox(colorPixels,ofColor::green,x,pb2Rect.y-10,3,pb2Rect.height+20);
                     break;
                 }
 
@@ -172,32 +191,25 @@ void testApp::update(){
             c = colorPixels.getColor(p2m1p.x,p2m1p.y);
             p2m1 = (c.r>mThreshold);
 
-            for(int i=0;i<c.r;i++) {
-                colorPixels.setColor(p2m1p.x,p2m1p.y+i,i%10?ofColor::red:ofColor::green);
-            }
+            drawNotchedBox(colorPixels,ofColor::red,ofColor::green,p2m1p.x-2,p2m1p.y,3,c.r,0,10);
 
 
             c = colorPixels.getColor(p2m2p.x,p2m2p.y);
             p2m2 = (c.r>mThreshold);
 
-            for(int i=0;i<c.r;i++) {
-                colorPixels.setColor(p2m2p.x,p2m2p.y+i,i%10?ofColor::red:ofColor::green);
-            }
+            drawNotchedBox(colorPixels,ofColor::red,ofColor::green,p2m2p.x-2,p2m2p.y,3,c.r,0,10);
+
 
             c = colorPixels.getColor(p1m1p.x,p1m1p.y);
             p1m1 = (c.r>mThreshold);
 
-            for(int i=0;i<c.r;i++) {
-                colorPixels.setColor(p1m1p.x,p1m1p.y+i,i%10?ofColor::red:ofColor::green);
-            }
+            drawNotchedBox(colorPixels,ofColor::red,ofColor::green,p1m1p.x-2,p1m1p.y,3,c.r,0,10);
+
 
             c = colorPixels.getColor(p1m2p.x,p1m2p.y);
             p1m2 = (c.r>mThreshold);
 
-            for(int i=0;i<c.r;i++) {
-                colorPixels.setColor(p1m2p.x,p1m2p.y+i,i%10?ofColor::red:ofColor::green);
-            }
-
+            drawNotchedBox(colorPixels,ofColor::red,ofColor::green,p1m2p.x-2,p1m2p.y,3,c.r,0,10);
 
 
         }
